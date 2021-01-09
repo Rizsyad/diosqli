@@ -280,8 +280,6 @@ $(document).ready(function () {
 
         m = regex.exec(res.replace(/[\n\r]/g, ""))
 
-        console.log(res)
-        
         dataTable = m[1]
         viewData()
     }
