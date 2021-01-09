@@ -291,9 +291,9 @@ $(document).ready(function () {
             let splitDatacol = splitData[index].split("{:::}")
             splitDatacol.forEach(dataCol => {
                 $("#tbody_template").append(`
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                ${dataCol}
-                            </th>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${dataCol}
+                    </td>
                         `)
             })
             $("#tbody_template").append("</tr>")
