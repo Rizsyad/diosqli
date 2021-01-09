@@ -278,7 +278,7 @@ $(document).ready(function () {
 
         let res = await $.get(urlinjection)
 
-        m = regex.exec(res)
+        m = regex.exec(res.replace(/[\n\r]/g, ""))
         dataTable = m[1]
         viewData()
     }
