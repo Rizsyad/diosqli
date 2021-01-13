@@ -245,11 +245,11 @@ $(document).ready(function () {
         setInterval(function(){
             $("#time").html(moment().format('LL, hh:mm:ss a'))
         },1000)
-        
-        await getInfo()
-        setDatabase()
 
         $("#output_info").hide()
+
+        await getInfo()
+        setDatabase()
 
         $("#getInfo").on('click', function() {
             $("#output").hide()
