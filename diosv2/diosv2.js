@@ -249,8 +249,8 @@ $(document).ready(function () {
         $("#output_info").hide()
         $("#menuscontrol").hide()
 
+        setDatabase()
         getInfo()
-        await setDatabase()
 
         $("#getInfo").on('click', function() {
             $("#output").hide()
