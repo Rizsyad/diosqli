@@ -107,7 +107,7 @@ $(document).ready(function () {
     </div>
     
     <div class="container mx-auto mt-4">
-        <ul class="flex text-gray-500 text-sm lg:text-base bg-white p-3 rounded-md" id="menuscontrol"></ul>
+        <ul class="flex text-gray-500 text-sm lg:text-base bg-white p-3 rounded-md mb-3" id="menuscontrol"></ul>
         <div class="flex flex-col">
             <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
