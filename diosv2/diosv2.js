@@ -92,14 +92,14 @@ $(document).ready(function () {
 
         let template = `
     <style>
-    tr:nth-child(even) {
-        --tw-bg-opacity: 1;
-        background-color: rgba(229,231,235,var(--tw-bg-opacity));
-    }
-    tr:hover {
-        --tw-bg-opacity: 1;
-        background-color: rgba(209, 213, 219, var(--tw-bg-opacity));
-    }
+        tr:nth-child(even) {
+            --tw-bg-opacity: 1 !important;
+            background-color: rgba(229,231,235,var(--tw-bg-opacity)) !important;
+        }
+        tr:hover {
+            --tw-bg-opacity: 1 !important;
+            background-color: rgba(209, 213, 219, var(--tw-bg-opacity)) !important;
+        }
     </style>
     <div class="container mx-auto">
         <img class="rounded-full flex mx-auto"
