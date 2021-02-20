@@ -12,3 +12,4 @@
 
 ### View 
 [DIOS BY INDOSEC WAF](https://github.com/Rizsyad/diosqli/blob/master/assets/Screenshot_2019-07-22%20DIOS%20By%20%7B%20INDOSEC%20%7D.png)
+[DIOS BY INDOSEC WAF V2](https://raw.githubusercontent.com/Rizsyad/diosqli/master/assets/Screen%20Shot%202021-02-20%20at%2019.55.03.png)
